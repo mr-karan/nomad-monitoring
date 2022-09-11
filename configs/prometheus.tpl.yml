@@ -1,0 +1,18 @@
+global:
+  scrape_interval: 10s
+  external_labels:
+    env: "dev"
+    cluster: "local"
+
+scrape_configs:
+  - job_name: "nomad-agent"
+    metrics_path: "/v1/metrics?format=prometheus"
+    static_configs:
+      - targets: ["{{env "NOMAD_IP_vmagent_http"}}:4646"]
+        labels:
+          role: agent
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: "([^:]+):.+"
+        target_label: "hostname"
+        replacement: "nomad-agent-$1"
